@@ -29,6 +29,8 @@ class WeatherApp(QWidget):
 
         self.setLayout(vbox)
 
+        self.city_input.setMinimumHeight(60)
+
         self.city_label.setAlignment(Qt.AlignCenter)
         self.city_input.setAlignment(Qt.AlignCenter)
         self.temperature_label.setAlignment(Qt.AlignCenter)
@@ -36,22 +38,22 @@ class WeatherApp(QWidget):
         self.description_label.setAlignment(Qt.AlignCenter)
 
         self.city_label.setObjectName("city_label")
-        self.city_label.setObjectName("city_input")
-        self.city_label.setObjectName("get_weather_button")
-        self.city_label.setObjectName("temperature_label")
-        self.city_label.setObjectName("emoji_label")
-        self.city_label.setObjectName("description_label")
+        self.city_input.setObjectName("city_input")
+        self.get_weather_button.setObjectName("get_weather_button")
+        self.temperature_label.setObjectName("temperature_label")
+        self.emoji_label.setObjectName("emoji_label")
+        self.description_label.setObjectName("description_label")
 
         self.setStyleSheet("""
             QLabel, QPushButton{
                 font-family: arial;
             }
             QLabel#city_label{
-                font-size: 40px;
+                font-size: 50px;
                 font-style: italic;
             }
             QLineEdit#city_input{
-                font-size: 40px;
+                font-size: 50px;
             }
             QPushButton#get_weather_button{
                 font-size: 40px;
@@ -62,7 +64,7 @@ class WeatherApp(QWidget):
             }
             QLabel#emoji_label{
                 font-size: 100px;
-                font-family: Segoe UI emoji; 
+                font-family: Apple Color Emoji; 
             }
             QLabel#description_label{
                 font-size: 50px;
@@ -78,7 +80,7 @@ class WeatherApp(QWidget):
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout =10)
             response.raise_for_status()
             data = response.json()
 
@@ -99,9 +101,9 @@ class WeatherApp(QWidget):
                 case 502:
                     self.display_error("Bad Gateway:\nInvalid response from the server")
                 case 503:
-                    self.display_errornt("Service Unavailable:\nServer is down")
+                    self.display_error("Service Unavailable:\nServer is down")
                 case 504:
-                    self.display_errornt("Gateway Timeout:\nNo response from the server")
+                    self.display_error("Gateway Timeout:\nNo response from the server")
                 case _:
                     self.display_error(f"HTTP error occurred:\n{http_error}")
 
@@ -109,7 +111,7 @@ class WeatherApp(QWidget):
             self.display_error("Connection Error:\nCheck your internet connection")
         except requests.exceptions.Timeout:
             self.display_error("Timeout Error:\nThe request timed out")
-        except requests.exceptions.ToomanyRedirects:
+        except requests.exceptions.TooManyRedirects:
             self.display_error("Too many redirects:\nCheck the URL")
         except requests.exceptions.RequestException as req_error:
             self.display_error(f"Request Error:\n{req_error}")
